@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const User = require('../models/User.model')
 const { isAuthenticated } = require("../middlewares/jwt.middleware")
+const Commerce = require('../models/Commerce.model')
 
 const saltRounds = 10
 
@@ -13,7 +14,7 @@ const saltRounds = 10
 
 router.post('/signup', (req, res, next) => {
 
-    const { email, password, username } = req.body
+    const { firstName, lastName, telephone, profileImg, email, password, username, role } = req.body
 
 
     User
@@ -26,7 +27,7 @@ router.post('/signup', (req, res, next) => {
             const salt = bcrypt.genSaltSync(saltRounds)
             const hashedPassword = bcrypt.hashSync(password, salt)
 
-            return User.create({ email, password: hashedPassword, username })
+            return User.create({ firstName, lastName, telephone, profileImg, email, password: hashedPassword, username, role })
 
         })
         .then((createdUser) => {
@@ -37,11 +38,14 @@ router.post('/signup', (req, res, next) => {
         })
         .catch(err => {
             console.log(err)
-            res.status(500).jason({ message: "Error" })
+            res.status(500).json({ message: "Error" })
         })
 
 
 })
+
+
+//LOGIN
 
 router.post('/login', (req, res, next) => {
 
@@ -63,9 +67,9 @@ router.post('/login', (req, res, next) => {
 
             if (bcrypt.compareSync(password, foundUser.password)) {
 
-                const { _id, email, username } = foundUser
+                const { _id, email, username, role } = foundUser
 
-                const payload = { _id, email, username }
+                const payload = { _id, email, username, role }
 
                 const authToken = jwt.sign(
                     payload,
@@ -86,37 +90,13 @@ router.post('/login', (req, res, next) => {
 })
 
 
+//VERIFY
+
 router.get('/verify', isAuthenticated, (req, res, next) => {
     res.status(200).json(req.payload)
 })
 
 
-//EDIT USER
-
-router.put('/edit', isAuthenticated, (req, res) => {
-
-    const { id } = req.payload
-    console.log('helluuu')
-    // const { firstName, lastName, telephone } = req.body
-
-    // User
-    //     .findByIdAndUpdate(id, { firstName, lastName, telephone }, { new: true })
-    //     .then(response => res.json(response))
-    //     .catch(err => res.status(500).json(err))
-})
-
-//EDIT IMAGE
-
-// router.put('/edit-image', isAuthenticated, (req, res) => {
-
-//     const { id } = req.payload
-//     const { profileImg } = req.body
-
-//     User
-//         .findByIdAndUpdate(id, { profileImg }, { new: true })
-//         .then(response => res.json(response))
-//         .catch(err => res.status(500).json(err))
-// })
 
 
 module.exports = router

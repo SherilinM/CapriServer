@@ -7,15 +7,21 @@ const commerceSchema = new Schema(
         owner: {
             type: Schema.Types.ObjectId,
             ref: 'User',
-            required: [true, 'mi titulo']
+            required: [true, 'My owner']
         },
         description: {
             type: String,
-            required: [true, 'esta es mi descripcion'],
+            required: [true, 'Description'],
+        },
+        location: {
+            type: {
+                type: String,
+            },
+            coordinates: [Number]
         },
         imageUrl: {
             type: String,
-            required: [true, 'mi imagen']
+            required: [true, 'Image']
         },
         category: String,
         address: {
@@ -23,14 +29,9 @@ const commerceSchema = new Schema(
                 type: {
                     type: String
                 },
-                coordinates: [Number],
-                // required: [true, 'direccion']
+                coordinates: [Number]
             }
         },
-        comments: [{
-            type: Schema.Types.ObjectId,
-            ref: 'Comment'
-        }],
         like: Number
     },
 
@@ -41,5 +42,5 @@ const commerceSchema = new Schema(
 
 
 const Commerce = model("Commerce", commerceSchema);
-
+Commerce.syncIndexes()
 module.exports = Commerce;
